@@ -1,0 +1,29 @@
+import type { Apartment, ApartmentImage, Amenity, Reservation } from '@prisma/client'
+
+export type ApartmentWithImages = Apartment & {
+  images: ApartmentImage[]
+}
+
+export type ApartmentWithRelations = Apartment & {
+  images: ApartmentImage[]
+  amenities: Array<{
+    amenity: Amenity
+  }>
+  reservations: Pick<Reservation, 'checkIn' | 'checkOut' | 'status'>[]
+}
+
+export interface SearchParams {
+  checkIn?: string
+  checkOut?: string
+  adults?: string | number
+  children?: string | number
+}
+
+export interface ReservationResult {
+  success: boolean
+  reservationId?: number
+  error?: string
+  fieldErrors?: Record<string, string[]>
+}
+
+export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED'
