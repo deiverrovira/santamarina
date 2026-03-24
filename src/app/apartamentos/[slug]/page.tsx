@@ -18,11 +18,13 @@ interface PageProps {
   }
 }
 
+const isValid = (val: string | undefined): val is string => typeof val === "string" && val.trim() !== '' && val !== 'undefined'
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const apartment = await getApartmentBySlug(params.slug)
   if (!apartment) return { title: 'Apartamento no encontrado' }
   return {
-    title: `${apartment.name} · Mariana`,
+    title: `${apartment.name} · Santa Marina`,
     description: apartment.shortDescription,
   }
 }
@@ -35,10 +37,10 @@ export default async function ApartmentDetailPage({ params, searchParams }: Page
   }
 
   const backParams = new URLSearchParams()
-  if (searchParams.checkIn) backParams.set('checkIn', searchParams.checkIn)
-  if (searchParams.checkOut) backParams.set('checkOut', searchParams.checkOut)
-  if (searchParams.adults) backParams.set('adults', searchParams.adults)
-  if (searchParams.children) backParams.set('children', searchParams.children)
+  if (isValid(searchParams.checkIn)) backParams.set('checkIn', searchParams.checkIn)
+  if (isValid(searchParams.checkOut)) backParams.set('checkOut', searchParams.checkOut)
+  if (isValid(searchParams.adults)) backParams.set('adults', searchParams.adults)
+  if (isValid(searchParams.children)) backParams.set('children', searchParams.children)
   const backUrl = `/apartamentos${backParams.toString() ? `?${backParams.toString()}` : ''}`
 
   const upcomingReservations = apartment.reservations
@@ -49,7 +51,7 @@ export default async function ApartmentDetailPage({ params, searchParams }: Page
     <div className="bg-gray-50 min-h-screen">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Back button */}
-        <Link href={backUrl} className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-teal-600 transition-colors mb-6">
+        <Link href={backUrl} className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" />
           Volver a resultados
         </Link>

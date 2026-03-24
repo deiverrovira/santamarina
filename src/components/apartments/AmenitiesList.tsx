@@ -30,8 +30,8 @@ export default function AmenitiesList({ amenities }: AmenitiesListProps) {
           const Icon = iconMap[amenity.icon] || Star
           return (
             <div key={amenity.id} className="flex items-center gap-2.5 text-sm text-gray-700">
-              <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center flex-shrink-0">
-                <Icon className="w-4 h-4 text-teal-600" />
+              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <Icon className="w-4 h-4 text-blue-600" />
               </div>
               <span>{amenity.name}</span>
             </div>

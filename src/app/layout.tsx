@@ -8,8 +8,8 @@ import WhatsAppButton from '@/components/ui/WhatsAppButton'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Mariana · Conjunto Turístico',
-  description: 'Reserva tu apartamento en el Conjunto Turístico Mariana. Experiencias únicas en el Caribe colombiano.',
+  title: 'Santa Marina · Conjunto Turístico',
+  description: 'Reserva tu apartamento en el Conjunto Turístico Santa Marina. Experiencias únicas en el Caribe colombiano.',
 }
 
 export default function RootLayout({

@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default function Navbar() {
@@ -6,21 +7,26 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-teal-600 text-white font-bold text-sm">
-              M
+            <div className="flex items-center justify-center w-10 h-10 p-0 m-0 rounded-lg bg-blue-800 text-white font-bold text-sm">
+            <Image
+            src={'/logos/Santa-marina-blanco.png'}
+            alt='Santa Marina Logo'
+            width={100}
+            height={100}
+            />
             </div>
-            <span className="text-xl font-bold text-gray-900">Mariana</span>
+            <span className="text-xl font-bold text-gray-900">Santa Marina</span>
             <span className="hidden sm:inline text-sm text-gray-400 font-normal">· Conjunto Turístico</span>
           </Link>
 
           <nav className="flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium text-gray-600 hover:text-teal-600 transition-colors">
+            <Link href="/" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
               Inicio
             </Link>
-            <Link href="/apartamentos" className="text-sm font-medium text-gray-600 hover:text-teal-600 transition-colors">
+            <Link href="/apartamentos" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
               Apartamentos
             </Link>
-            <Link href="/admin" className="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors">
+            <Link href="/admin" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
               Admin
             </Link>
           </nav>

@@ -54,7 +54,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
           <div className="flex items-center justify-between py-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Panel de administración</h1>
-              <p className="text-sm text-gray-400 mt-0.5">Gestión de solicitudes · Conjunto Turístico Mariana</p>
+              <p className="text-sm text-gray-400 mt-0.5">Gestión de solicitudes · Conjunto Turístico Santa Marina</p>
             </div>
             {counts.pending > 0 && (
               <div className="hidden sm:flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl px-4 py-2.5 text-sm font-semibold">
@@ -94,14 +94,14 @@ export default async function AdminPage({ searchParams }: PageProps) {
                   href={key === 'ALL' ? '/admin' : `/admin?status=${key.toLowerCase()}`}
                   className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
                     active
-                      ? 'border-teal-600 text-teal-600'
+                      ? 'border-blue-600 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${active ? 'text-teal-600' : color}`} />
+                  <Icon className={`w-4 h-4 ${active ? 'text-blue-600' : color}`} />
                   {label}
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                    active ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500'
+                    active ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
                   }`}>
                     {count}
                   </span>
@@ -146,7 +146,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
                     return (
                       <tr
                         key={r.id}
-                        className={`border-b border-gray-50 hover:bg-teal-50/30 transition-colors ${idx % 2 === 0 ? '' : 'bg-gray-50/30'}`}
+                        className={`border-b border-gray-50 hover:bg-blue-50/30 transition-colors ${idx % 2 === 0 ? '' : 'bg-gray-50/30'}`}
                       >
                         {/* Apartment */}
                         <td className="px-6 py-4">
@@ -178,11 +178,11 @@ export default async function AdminPage({ searchParams }: PageProps) {
                         {/* Dates */}
                         <td className="px-5 py-4">
                           <p className="flex items-center gap-1.5 text-gray-700">
-                            <Calendar className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" />
+                            <Calendar className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
                             {formatDate(r.checkIn)}
                           </p>
                           <p className="text-xs text-gray-400 mt-0.5 pl-5">↳ {formatDate(r.checkOut)}</p>
-                          <p className="text-xs font-semibold text-teal-600 mt-0.5 pl-5">{nights} {nights === 1 ? 'noche' : 'noches'}</p>
+                          <p className="text-xs font-semibold text-blue-600 mt-0.5 pl-5">{nights} {nights === 1 ? 'noche' : 'noches'}</p>
                         </td>
                         {/* Guests */}
                         <td className="px-5 py-4">

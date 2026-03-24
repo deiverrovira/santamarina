@@ -28,8 +28,8 @@ async function ApartmentsList({ searchParams }: PageProps) {
   return (
     <div>
       {hasSearch && (
-        <div className="flex items-center gap-2 mb-6 text-sm text-gray-600 bg-teal-50 rounded-xl px-4 py-3">
-          <SlidersHorizontal className="w-4 h-4 text-teal-600" />
+        <div className="flex items-center gap-2 mb-6 text-sm text-gray-600 bg-blue-50 rounded-xl px-4 py-3">
+          <SlidersHorizontal className="w-4 h-4 text-blue-600" />
           <span>
             Mostrando resultados del{' '}
             <strong className="text-gray-900">{formatDate(searchParams.checkIn!)}</strong>
@@ -56,7 +56,7 @@ async function ApartmentsList({ searchParams }: PageProps) {
           </p>
           <Link
             href="/apartamentos"
-            className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-teal-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-blue-500 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-colors"
           >
             Ver todos los apartamentos
           </Link>

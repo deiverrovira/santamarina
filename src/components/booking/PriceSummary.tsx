@@ -23,14 +23,14 @@ export default function PriceSummary({ pricePerNight, checkIn, checkOut }: Price
   const total = nights * pricePerNight
 
   return (
-    <div className="bg-teal-50 rounded-xl p-4 space-y-2 text-sm">
+    <div className="bg-blue-50 rounded-xl p-4 space-y-2 text-sm">
       <div className="flex justify-between text-gray-700">
         <span>{formatCurrency(pricePerNight)} × {nights} {nights === 1 ? 'noche' : 'noches'}</span>
         <span>{formatCurrency(total)}</span>
       </div>
-      <div className="border-t border-teal-200 pt-2 flex justify-between font-semibold text-gray-900">
+      <div className="border-t border-blue-200 pt-2 flex justify-between font-semibold text-gray-900">
         <span>Total estimado</span>
-        <span className="text-teal-700">{formatCurrency(total)}</span>
+        <span className="text-blue-700">{formatCurrency(total)}</span>
       </div>
       <p className="text-xs text-gray-400">* No incluye impuestos. Pago al momento del check-in.</p>
     </div>

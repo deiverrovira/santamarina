@@ -1,7 +1,7 @@
 'use client'
 
-const WA_NUMBER = '573166382976'
-const WA_MESSAGE = 'Hola, tengo una consulta sobre una reserva en el Conjunto Turístico Mariana.'
+const WA_NUMBER = '573166832976'
+const WA_MESSAGE = 'Hola, tengo una consulta sobre una reserva en el Conjunto Turístico Santa Marina.'
 const WA_URL = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_MESSAGE)}`
 
 export default function WhatsAppButton() {

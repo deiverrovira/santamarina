@@ -15,8 +15,8 @@ export default function ApartmentGallery({ images }: ApartmentGalleryProps) {
 
   if (!images.length) {
     return (
-      <div className="w-full h-80 rounded-2xl bg-gradient-to-br from-teal-100 to-teal-200 flex items-center justify-center">
-        <span className="text-teal-400 text-6xl">🏖️</span>
+      <div className="w-full h-80 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+        <span className="text-blue-400 text-6xl">🏖️</span>
       </div>
     )
   }
@@ -67,14 +67,14 @@ export default function ApartmentGallery({ images }: ApartmentGalleryProps) {
       </div>
 
       {images.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-1 pt-1 pl-1">
           {images.map((img, i) => (
             <button
               key={img.id}
               onClick={() => setActiveIndex(i)}
               aria-label={`Ver ${img.alt}`}
               className={`relative flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden transition-all ${
-                i === activeIndex ? 'ring-2 ring-teal-500 ring-offset-1' : 'opacity-60 hover:opacity-90'
+                i === activeIndex ? 'ring-2 ring-blue-500 ring-offset-1' : 'opacity-60 hover:opacity-90'
               }`}
             >
               <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="80px" />

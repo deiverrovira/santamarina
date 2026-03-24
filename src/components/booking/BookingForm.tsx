@@ -131,7 +131,7 @@ export default function BookingForm({
           {...register('notes')}
           rows={3}
           placeholder="Hora estimada de llegada, peticiones especiales, etc."
-          className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 resize-none"
+          className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
         />
         {errors.notes && <p className="text-xs text-red-500">{errors.notes.message}</p>}
       </div>

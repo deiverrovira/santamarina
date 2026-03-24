@@ -26,8 +26,8 @@ export default function ApartmentCard({ apartment, searchParams }: ApartmentCard
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-teal-100 to-teal-200 flex items-center justify-center">
-            <span className="text-teal-400 text-4xl">🏖️</span>
+          <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+            <span className="text-blue-400 text-4xl">🏖️</span>
           </div>
         )}
         <div className="absolute top-3 right-3">
@@ -61,7 +61,7 @@ export default function ApartmentCard({ apartment, searchParams }: ApartmentCard
           </div>
           <Link
             href={`/apartamentos/${apartment.slug}${params}`}
-            className="flex items-center gap-1 text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
+            className="flex items-center gap-1 text-sm font-medium text-blue-500 hover:text-blue-700 transition-colors"
           >
             Ver detalle
             <ChevronRight className="w-4 h-4" />

@@ -19,7 +19,7 @@ export default async function ConfirmacionPage({ searchParams }: PageProps) {
           <div className="text-5xl mb-4">❌</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Reserva no encontrada</h1>
           <p className="text-gray-500 mb-6">No pudimos encontrar los detalles de tu reserva.</p>
-          <Link href="/" className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-teal-700 transition-colors">
+          <Link href="/" className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-colors">
             Volver al inicio
           </Link>
         </div>
@@ -85,8 +85,8 @@ export default async function ConfirmacionPage({ searchParams }: PageProps) {
 
             {/* Guests */}
             <div className="flex items-center gap-3 text-sm text-gray-700">
-              <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center">
-                <Users className="w-4 h-4 text-teal-600" />
+              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                <Users className="w-4 h-4 text-blue-600" />
               </div>
               <span>
                 {reservation.adults} adulto{reservation.adults !== 1 ? 's' : ''}
@@ -111,14 +111,14 @@ export default async function ConfirmacionPage({ searchParams }: PageProps) {
             </div>
 
             {/* Price summary */}
-            <div className="bg-teal-50 rounded-xl p-4 text-sm">
+            <div className="bg-blue-50 rounded-xl p-4 text-sm">
               <div className="flex justify-between text-gray-600 mb-2">
                 <span>{formatCurrency(reservation.apartment.pricePerNight)} × {nights} {nights === 1 ? 'noche' : 'noches'}</span>
                 <span>{formatCurrency(totalPrice)}</span>
               </div>
-              <div className="flex justify-between font-bold text-gray-900 border-t border-teal-200 pt-2">
+              <div className="flex justify-between font-bold text-gray-900 border-t border-blue-200 pt-2">
                 <span>Total estimado</span>
-                <span className="text-teal-700">{formatCurrency(totalPrice)}</span>
+                <span className="text-blue-700">{formatCurrency(totalPrice)}</span>
               </div>
             </div>
 
@@ -147,7 +147,7 @@ export default async function ConfirmacionPage({ searchParams }: PageProps) {
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
           <Link
             href="/"
-            className="flex-1 text-center bg-teal-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-teal-700 transition-colors"
+            className="flex-1 text-center bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors"
           >
             Volver al inicio
           </Link>
