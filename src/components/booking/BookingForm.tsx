@@ -8,9 +8,11 @@ import { BookingSchema, type BookingInput } from '@/lib/validations'
 import { createReservation } from '@/actions/reservations'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import PriceSummary from './PriceSummary'
 
 interface BookingFormProps {
   apartmentId: number
+  pricePerNight: number
   defaultCheckIn?: string
   defaultCheckOut?: string
   defaultAdults?: number
@@ -19,6 +21,7 @@ interface BookingFormProps {
 
 export default function BookingForm({
   apartmentId,
+  pricePerNight,
   defaultCheckIn,
   defaultCheckOut,
   defaultAdults = 1,
@@ -33,6 +36,7 @@ export default function BookingForm({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<BookingInput>({
     resolver: zodResolver(BookingSchema),
@@ -44,6 +48,8 @@ export default function BookingForm({
       children: defaultChildren,
     },
   })
+
+  const [watchCheckIn, watchCheckOut] = watch(['checkIn', 'checkOut'])
 
   const onSubmit = async (data: BookingInput) => {
     setServerError(null)
@@ -80,6 +86,13 @@ export default function BookingForm({
           error={errors.checkOut?.message}
         />
       </div>
+
+      {/* Resumen de precio reactivo — se actualiza al cambiar las fechas */}
+      <PriceSummary
+        pricePerNight={pricePerNight}
+        checkIn={watchCheckIn || undefined}
+        checkOut={watchCheckOut || undefined}
+      />
 
       <div className="grid grid-cols-2 gap-3">
         <Input

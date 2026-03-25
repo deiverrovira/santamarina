@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Users, Bed, Bath, ChevronRight } from 'lucide-react'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, calculateNights } from '@/lib/utils'
 import type { ApartmentWithImages } from '@/types'
 import Badge from '@/components/ui/Badge'
 
@@ -13,6 +13,11 @@ interface ApartmentCardProps {
 export default function ApartmentCard({ apartment, searchParams }: ApartmentCardProps) {
   const mainImage = apartment.images[0]
   const params = searchParams ? `?${new URLSearchParams(searchParams as Record<string, string>).toString()}` : ''
+
+  const nights = searchParams?.checkIn && searchParams?.checkOut
+    ? calculateNights(searchParams.checkIn, searchParams.checkOut)
+    : 0
+  const totalPrice = nights > 0 ? nights * apartment.pricePerNight : 0
 
   return (
     <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
@@ -56,8 +61,17 @@ export default function ApartmentCard({ apartment, searchParams }: ApartmentCard
 
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xl font-bold text-gray-900">{formatCurrency(apartment.pricePerNight)}</span>
-            <span className="text-sm text-gray-400 ml-1">/ noche</span>
+            {nights > 0 ? (
+              <>
+                <span className="text-xl font-bold text-gray-900">{formatCurrency(totalPrice)}</span>
+                <span className="text-sm text-gray-400 ml-1">· {nights} {nights === 1 ? 'noche' : 'noches'}</span>
+              </>
+            ) : (
+              <>
+                <span className="text-xl font-bold text-gray-900">{formatCurrency(apartment.pricePerNight)}</span>
+                <span className="text-sm text-gray-400 ml-1">/ noche</span>
+              </>
+            )}
           </div>
           <Link
             href={`/apartamentos/${apartment.slug}${params}`}

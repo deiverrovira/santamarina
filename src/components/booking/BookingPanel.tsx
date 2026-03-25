@@ -3,7 +3,6 @@
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import BookingForm from './BookingForm'
-import PriceSummary from './PriceSummary'
 
 interface BookingPanelProps {
   apartmentId: number
@@ -19,18 +18,16 @@ function BookingPanelInner({ apartmentId, pricePerNight }: BookingPanelProps) {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-      <div className="mb-5">
-        <div className="flex items-baseline gap-1 mb-1">
-          <span className="text-2xl font-bold text-gray-900">
-            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(pricePerNight)}
-          </span>
-          <span className="text-gray-400 text-sm">/ noche</span>
-        </div>
-        <PriceSummary pricePerNight={pricePerNight} checkIn={checkIn} checkOut={checkOut} />
+      <div className="flex items-baseline gap-1 mb-5">
+        <span className="text-2xl font-bold text-gray-900">
+          {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(pricePerNight)}
+        </span>
+        <span className="text-gray-400 text-sm">/ noche</span>
       </div>
 
       <BookingForm
         apartmentId={apartmentId}
+        pricePerNight={pricePerNight}
         defaultCheckIn={checkIn}
         defaultCheckOut={checkOut}
         defaultAdults={adults}
