@@ -17,6 +17,11 @@ export interface SearchParams {
   checkOut?: string
   adults?: string | number
   children?: string | number
+  minPrice?: string | number
+  maxPrice?: string | number
+  bedrooms?: string | number
+  sortBy?: 'price_asc' | 'price_desc' | 'newest'
+  amenityIds?: string // IDs separados por coma: "1,3,5"
 }
 
 export interface ReservationResult {
