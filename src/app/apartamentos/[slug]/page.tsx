@@ -18,7 +18,7 @@ interface PageProps {
   }
 }
 
-const isValid = (val: string | undefined): val is string => typeof val === "string" && val.trim() !== '' && val !== 'undefined'
+const isValid = (val: unknown): val is string => typeof val === 'string' && val.trim() !== '' && val !== 'undefined'
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const apartment = await getApartmentBySlug(params.slug)
@@ -30,17 +30,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ApartmentDetailPage({ params, searchParams }: PageProps) {
-  const apartment = await getApartmentBySlug(params.slug)
+  const {slug} = params
+  const resolveSearchParams = await searchParams
+  const apartment = await getApartmentBySlug(slug)
 
   if (!apartment) {
     notFound()
   }
 
   const backParams = new URLSearchParams()
-  if (isValid(searchParams.checkIn)) backParams.set('checkIn', searchParams.checkIn)
-  if (isValid(searchParams.checkOut)) backParams.set('checkOut', searchParams.checkOut)
-  if (isValid(searchParams.adults)) backParams.set('adults', searchParams.adults)
-  if (isValid(searchParams.children)) backParams.set('children', searchParams.children)
+
+  if (isValid(resolveSearchParams.checkIn)) backParams.set('checkIn', resolveSearchParams.checkIn)
+  if (isValid(resolveSearchParams.checkOut)) backParams.set('checkOut', resolveSearchParams.checkOut)
+  if (isValid(resolveSearchParams.adults)) backParams.set('adults', resolveSearchParams.adults)
+  if (isValid(resolveSearchParams.children)) backParams.set('children', resolveSearchParams.children)
   const backUrl = `/apartamentos${backParams.toString() ? `?${backParams.toString()}` : ''}`
 
   const upcomingReservations = apartment.reservations

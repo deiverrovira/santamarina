@@ -10,6 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ── Roles disponibles: admin | newApartament | guest ─────────────────────────
+model User {
+  id         Int         @id @default(autoincrement())
+  email      String      @unique
+  password   String      // bcrypt hash — nunca se devuelve en queries
+  role       String      @default("guest")      // admin | newApartament | guest
+  status     String      @default("active")     // active | inactive
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  apartments Apartment[] // apartamentos creados por este usuario
+}
+
 model Apartment {
   id               Int                @id @default(autoincrement())
   slug             String             @unique
@@ -24,6 +36,9 @@ model Apartment {
   isActive         Boolean            @default(true)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
+  // Relación con el usuario que creó el apartamento
+  createdById      Int?
+  createdBy        User?              @relation(fields: [createdById], references: [id], onDelete: SetNull)
   images           ApartmentImage[]
   amenities        ApartmentAmenity[]
   reservations     Reservation[]

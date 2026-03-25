@@ -1,4 +1,4 @@
-import type { Apartment, ApartmentImage, Amenity, Reservation } from '@prisma/client'
+import type { Apartment, ApartmentImage, Amenity, Reservation, User } from '@prisma/client'
 
 export type ApartmentWithImages = Apartment & {
   images: ApartmentImage[]
@@ -27,3 +27,9 @@ export interface ReservationResult {
 }
 
 export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED'
+
+export type ApartmentForAdmin = Apartment & {
+  images: ApartmentImage[]
+  createdBy: Pick<User, 'id' | 'email'> | null
+  _count: { reservations: number }
+}

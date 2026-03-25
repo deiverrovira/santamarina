@@ -39,7 +39,7 @@ export default function Footer() {
               <li>📞 +57 316 026 0173</li>
               <li>📍 KR 4 #191-744 Conjunto Residencial Santa Marina
               PH Sector Don Jaca</li>
-              <li>📍 Cartagena de Indias, Colombia</li>
+              <li>📍 Santa Marta, Colombia</li>
             </ul>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -23,6 +24,18 @@ async function main() {
   await prisma.apartmentImage.deleteMany()
   await prisma.amenity.deleteMany()
   await prisma.apartment.deleteMany()
+  await prisma.user.deleteMany()
+
+  // ── Usuario admin inicial ───────────────────
+  const adminPassword = await bcrypt.hash('Admin2026.', 12)
+  await prisma.user.create({
+    data: {
+      email: 'admin@santamarina.com',
+      password: adminPassword,
+      role: 'admin',
+      status: 'active',
+    },
+  })
 
   // ── Amenities ──────────────────────────────
   const amenities = await Promise.all([
@@ -228,6 +241,7 @@ async function main() {
   ]})
 
   console.log('✅ Seed completado')
+  console.log('   → 1 usuario admin (admin@santamarina.com / Admin2026.)')
   console.log('   → 6 apartamentos · 10 comodidades · 3 reservas de prueba')
   console.log(`   → Imágenes sirviendo desde Cloudinary (cloud: ${CLOUD})`)
 }

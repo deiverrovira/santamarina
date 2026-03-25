@@ -1,9 +1,10 @@
 import { getReservations, getReservationCounts } from '@/actions/admin'
 import { formatCurrency, formatDate, calculateNights } from '@/lib/utils'
+import { requireRole } from '@/actions/auth'
 import ReservationActions from './ReservationActions'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Users, Calendar, Phone, Mail, BedDouble, ClipboardList, CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { Users, Calendar, Phone, Mail, BedDouble, ClipboardList, CheckCircle2, Clock, XCircle, Plus } from 'lucide-react'
 
 type FilterTab = 'ALL' | 'PENDING' | 'CONFIRMED' | 'CANCELLED'
 
@@ -28,6 +29,8 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function AdminPage({ searchParams }: PageProps) {
+  // Solo admin puede ver el panel de reservas
+  await requireRole('admin')
   const rawFilter = (searchParams.status || 'ALL').toUpperCase()
   const filter: FilterTab = (['ALL', 'PENDING', 'CONFIRMED', 'CANCELLED'] as const).includes(rawFilter as FilterTab)
     ? (rawFilter as FilterTab)
@@ -56,12 +59,15 @@ export default async function AdminPage({ searchParams }: PageProps) {
               <h1 className="text-2xl font-bold text-gray-900">Panel de administración</h1>
               <p className="text-sm text-gray-400 mt-0.5">Gestión de solicitudes · Conjunto Turístico Santa Marina</p>
             </div>
-            {counts.pending > 0 && (
-              <div className="hidden sm:flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl px-4 py-2.5 text-sm font-semibold">
-                <Clock className="w-4 h-4" />
-                {counts.pending} pendiente{counts.pending !== 1 ? 's' : ''} por revisar
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              {counts.pending > 0 && (
+                <div className="hidden sm:flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl px-4 py-2.5 text-sm font-semibold">
+                  <Clock className="w-4 h-4" />
+                  {counts.pending} pendiente{counts.pending !== 1 ? 's' : ''} por revisar
+                </div>
+              )}
+              
+            </div>
           </div>
 
           {/* ── Stat cards ── */}

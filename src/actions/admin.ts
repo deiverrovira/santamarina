@@ -2,11 +2,13 @@
 
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
+import { requireRole } from '@/actions/auth'
 import type { ReservationStatus } from '@/types'
 
 export type ReservationWithApartment = Awaited<ReturnType<typeof getReservations>>[number]
 
 export async function getReservations(filter: ReservationStatus | 'ALL' = 'ALL') {
+  await requireRole('admin')
   return prisma.reservation.findMany({
     where: filter !== 'ALL' ? { status: filter } : undefined,
     include: {
@@ -24,6 +26,7 @@ export async function updateReservationStatus(
   id: number,
   status: 'CONFIRMED' | 'CANCELLED'
 ): Promise<{ success: boolean; error?: string }> {
+  await requireRole('admin')
   try {
     await prisma.reservation.update({
       where: { id },
@@ -37,6 +40,7 @@ export async function updateReservationStatus(
 }
 
 export async function getReservationCounts() {
+  await requireRole('admin')
   const [total, pending, confirmed, cancelled] = await Promise.all([
     prisma.reservation.count(),
     prisma.reservation.count({ where: { status: 'PENDING' } }),
