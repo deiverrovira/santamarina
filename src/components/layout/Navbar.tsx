@@ -42,6 +42,12 @@ export default async function Navbar() {
               >
                 Apartamentos
               </Link>
+              <Link
+                href="/areas-comunes"
+                className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors px-2 py-1"
+              >
+                Áreas comunes
+              </Link>
 
               {/* Acceso admin — solo si tiene sesión */}
               {role === 'admin' && (
