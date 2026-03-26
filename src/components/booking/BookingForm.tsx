@@ -13,6 +13,8 @@ import PriceSummary from './PriceSummary'
 interface BookingFormProps {
   apartmentId: number
   pricePerNight: number
+  minStay: number
+  maxStay: number
   defaultCheckIn?: string
   defaultCheckOut?: string
   defaultAdults?: number
@@ -22,6 +24,8 @@ interface BookingFormProps {
 export default function BookingForm({
   apartmentId,
   pricePerNight,
+  minStay,
+  maxStay,
   defaultCheckIn,
   defaultCheckOut,
   defaultAdults = 1,
@@ -50,6 +54,24 @@ export default function BookingForm({
   })
 
   const [watchCheckIn, watchCheckOut] = watch(['checkIn', 'checkOut'])
+
+  // Calcular noches y validar estadía
+  const stayNights =
+    watchCheckIn && watchCheckOut
+      ? Math.round(
+          (new Date(watchCheckOut).getTime() - new Date(watchCheckIn).getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      : null
+
+  const stayError =
+    stayNights !== null && stayNights > 0
+      ? stayNights < minStay
+        ? `Este apartamento requiere una estadía mínima de ${minStay} noche${minStay !== 1 ? 's' : ''}.`
+        : stayNights > maxStay
+        ? `Este apartamento permite una estadía máxima de ${maxStay} noche${maxStay !== 1 ? 's' : ''}.`
+        : null
+      : null
 
   const onSubmit = async (data: BookingInput) => {
     setServerError(null)
@@ -93,6 +115,14 @@ export default function BookingForm({
         checkIn={watchCheckIn || undefined}
         checkOut={watchCheckOut || undefined}
       />
+
+      {/* Alerta de estadía mínima / máxima */}
+      {stayError && (
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-4 py-3 text-sm">
+          <span className="text-lg leading-none mt-0.5">⚠️</span>
+          <span>{stayError}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <Input
@@ -155,7 +185,7 @@ export default function BookingForm({
         </div>
       )}
 
-      <Button type="submit" size="lg" className="w-full" loading={loading}>
+      <Button type="submit" size="lg" className="w-full" loading={loading} disabled={!!stayError}>
         Solicitar reserva
       </Button>
 

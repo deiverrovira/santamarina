@@ -1,10 +1,12 @@
 import { Suspense } from 'react'
-import { getApartments } from '@/actions/apartments'
+import { getApartments, getAllAmenities } from '@/actions/apartments'
 import ApartmentCard from '@/components/apartments/ApartmentCard'
 import SearchForm from '@/components/search/SearchForm'
+import FilterDrawer from '@/components/search/FilterDrawer'
 import { formatDate } from '@/lib/utils'
 import { SlidersHorizontal } from 'lucide-react'
 import Link from 'next/link'
+import type { SearchParams } from '@/types'
 
 interface PageProps {
   searchParams: {
@@ -12,18 +14,31 @@ interface PageProps {
     checkOut?: string
     adults?: string
     children?: string
+    minPrice?: string
+    maxPrice?: string
+    bedrooms?: string
+    beds?: string
+    sortBy?: string
+    amenityIds?: string
   }
 }
 
 async function ApartmentsList({ searchParams }: PageProps) {
-  const apartments = await getApartments({
-    checkIn: searchParams.checkIn,
-    checkOut: searchParams.checkOut,
-    adults: searchParams.adults,
-    children: searchParams.children,
-  })
+  const params: SearchParams = {
+    checkIn:    searchParams.checkIn,
+    checkOut:   searchParams.checkOut,
+    adults:     searchParams.adults,
+    children:   searchParams.children,
+    minPrice:   searchParams.minPrice,
+    maxPrice:   searchParams.maxPrice,
+    bedrooms:   searchParams.bedrooms,
+    beds:       searchParams.beds,
+    sortBy:     searchParams.sortBy as SearchParams['sortBy'],
+    amenityIds: searchParams.amenityIds,
+  }
 
-  const hasSearch = searchParams.checkIn && searchParams.checkOut
+  const apartments = await getApartments(params)
+  const hasSearch  = searchParams.checkIn && searchParams.checkOut
 
   return (
     <div>
@@ -51,8 +66,8 @@ async function ApartmentsList({ searchParams }: PageProps) {
             No encontramos apartamentos disponibles
           </h3>
           <p className="text-gray-500 mb-6 max-w-md mx-auto">
-            No hay apartamentos disponibles para las fechas y cantidad de huéspedes seleccionados.
-            Intenta con otras fechas.
+            No hay apartamentos que coincidan con los filtros seleccionados.
+            Intenta con otros criterios.
           </p>
           <Link
             href="/apartamentos"
@@ -72,9 +87,9 @@ async function ApartmentsList({ searchParams }: PageProps) {
                 key={apt.id}
                 apartment={apt}
                 searchParams={{
-                  checkIn: searchParams.checkIn,
+                  checkIn:  searchParams.checkIn,
                   checkOut: searchParams.checkOut,
-                  adults: searchParams.adults,
+                  adults:   searchParams.adults,
                   children: searchParams.children,
                 }}
               />
@@ -86,8 +101,9 @@ async function ApartmentsList({ searchParams }: PageProps) {
   )
 }
 
-export default function ApartamentosPage({ searchParams }: PageProps) {
+export default async function ApartamentosPage({ searchParams }: PageProps) {
   const hasSearch = searchParams.checkIn && searchParams.checkOut
+  const amenities = await getAllAmenities()
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -96,15 +112,21 @@ export default function ApartamentosPage({ searchParams }: PageProps) {
           <h1 className="text-2xl font-bold text-gray-900 mb-6">
             {hasSearch ? 'Resultados de búsqueda' : 'Todos los apartamentos'}
           </h1>
-          <SearchForm
-            compact
-            defaultValues={{
-              checkIn: searchParams.checkIn,
-              checkOut: searchParams.checkOut,
-              adults: Number(searchParams.adults) || 2,
-              children: Number(searchParams.children) || 0,
-            }}
-          />
+          {/* Fila: buscador + botón filtros */}
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
+              <SearchForm
+                compact
+                defaultValues={{
+                  checkIn:  searchParams.checkIn,
+                  checkOut: searchParams.checkOut,
+                  adults:   Number(searchParams.adults)   || 2,
+                  children: Number(searchParams.children) || 0,
+                }}
+              />
+            </div>
+            <FilterDrawer amenities={amenities} />
+          </div>
         </div>
       </div>
 

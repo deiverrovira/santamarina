@@ -8,42 +8,81 @@ import type { Amenity } from '@prisma/client'
 import type { SearchParams, ApartmentWithImages, ApartmentWithRelations, ApartmentForAdmin } from '@/types'
 
 export async function getApartments(params: SearchParams): Promise<ApartmentWithImages[]> {
-  const adults = Number(params.adults) || 1
+  const adults   = Number(params.adults)   || 1
   const children = Number(params.children) || 0
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = {
-    isActive: true,
-    maxAdults: { gte: adults },
+    isActive:    true,
+    maxAdults:   { gte: adults },
     maxChildren: { gte: children },
   }
 
-  // Filter by availability if dates provided
-  if (params.checkIn && params.checkOut) {
-    const checkIn = new Date(params.checkIn)
-    const checkOut = new Date(params.checkOut)
+  // Filtro por precio
+  if (params.minPrice || params.maxPrice) {
+    where.pricePerNight = {}
+    if (params.minPrice) where.pricePerNight.gte = Number(params.minPrice)
+    if (params.maxPrice) where.pricePerNight.lte = Number(params.maxPrice)
+  }
 
+  // Filtro por camas mínimas
+  if (params.beds) {
+    where.beds = { gte: Number(params.beds) }
+  }
+
+  // Filtro por habitaciones mínimas
+  if (params.bedrooms) {
+    where.bedrooms = { gte: Number(params.bedrooms) }
+  }
+
+  // Filtro por comodidades (debe tener TODAS las seleccionadas)
+  if (params.amenityIds) {
+    const ids = String(params.amenityIds).split(',').map(Number).filter(Boolean)
+    if (ids.length > 0) {
+      where.amenities = {
+        some: { amenityId: { in: ids } },
+      }
+    }
+  }
+
+  // Filtro por estadía mínima/máxima cuando hay fechas seleccionadas
+  if (params.checkIn && params.checkOut) {
+    const nights = Math.round(
+      (new Date(params.checkOut).getTime() - new Date(params.checkIn).getTime()) / (1000 * 60 * 60 * 24)
+    )
+    if (nights > 0) {
+      where.minStay = { lte: nights }
+      where.maxStay = { gte: nights }
+    }
+  }
+
+  // Filtro por disponibilidad en rango de fechas
+  if (params.checkIn && params.checkOut) {
+    const checkIn  = new Date(params.checkIn)
+    const checkOut = new Date(params.checkOut)
     where.NOT = {
       reservations: {
         some: {
           AND: [
             { status: { not: 'CANCELLED' } },
-            { checkIn: { lt: checkOut } },
-            { checkOut: { gt: checkIn } },
+            { checkIn:  { lt: checkOut } },
+            { checkOut: { gt: checkIn  } },
           ],
         },
       },
     }
   }
 
+  // Orden según sortBy
+  const orderBy =
+    params.sortBy === 'price_desc' ? { pricePerNight: 'desc' as const } :
+    params.sortBy === 'newest'     ? { createdAt:     'desc' as const } :
+                                     { pricePerNight: 'asc'  as const }
+
   return prisma.apartment.findMany({
     where,
-    include: {
-      images: {
-        orderBy: { order: 'asc' },
-      },
-    },
-    orderBy: { pricePerNight: 'asc' },
+    include: { images: { orderBy: { order: 'asc' } } },
+    orderBy,
   })
 }
 
@@ -60,9 +99,12 @@ export async function createApartment(data: {
   shortDescription: string
   maxAdults: number
   maxChildren: number
+  beds: number
   bedrooms: number
   bathrooms: number
   pricePerNight: number
+  minStay: number
+  maxStay: number
   isActive: boolean
   amenityIds: number[]
   images: { url: string; alt: string; order: number }[]
@@ -144,9 +186,12 @@ export async function updateApartment(
     shortDescription: string
     maxAdults: number
     maxChildren: number
+    beds: number
     bedrooms: number
     bathrooms: number
     pricePerNight: number
+    minStay: number
+    maxStay: number
     isActive: boolean
     amenityIds: number[]
     images: { url: string; alt: string; order: number }[]

@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { BedDouble, Bath, Users, BookOpen, Pencil } from 'lucide-react'
+import { BedDouble, Bath, Users, BookOpen, Pencil, Bed } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import type { ApartmentForAdmin } from '@/types'
 import DeleteApartmentButton from './DeleteApartmentButton'
@@ -65,6 +65,10 @@ export default function ApartmentAdminCard({ apartment, role }: Props) {
 
         {/* Meta */}
         <div className="flex items-center gap-3 text-xs text-gray-500">
+          <span className="flex items-center gap-1">
+            <Bed className="w-3.5 h-3.5" />
+            {apartment.beds} cama{apartment.beds !== 1 ? 's' : ''}
+          </span>
           <span className="flex items-center gap-1">
             <BedDouble className="w-3.5 h-3.5" />
             {apartment.bedrooms} hab.

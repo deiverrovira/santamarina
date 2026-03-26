@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Apartment" ADD COLUMN     "maxStay" INTEGER NOT NULL DEFAULT 30,
+ADD COLUMN     "minStay" INTEGER NOT NULL DEFAULT 1;

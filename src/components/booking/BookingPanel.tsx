@@ -7,9 +7,11 @@ import BookingForm from './BookingForm'
 interface BookingPanelProps {
   apartmentId: number
   pricePerNight: number
+  minStay: number
+  maxStay: number
 }
 
-function BookingPanelInner({ apartmentId, pricePerNight }: BookingPanelProps) {
+function BookingPanelInner({ apartmentId, pricePerNight, minStay, maxStay }: BookingPanelProps) {
   const searchParams = useSearchParams()
   const checkIn = searchParams.get('checkIn') || undefined
   const checkOut = searchParams.get('checkOut') || undefined
@@ -28,6 +30,8 @@ function BookingPanelInner({ apartmentId, pricePerNight }: BookingPanelProps) {
       <BookingForm
         apartmentId={apartmentId}
         pricePerNight={pricePerNight}
+        minStay={minStay}
+        maxStay={maxStay}
         defaultCheckIn={checkIn}
         defaultCheckOut={checkOut}
         defaultAdults={adults}

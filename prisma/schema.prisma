@@ -30,9 +30,12 @@ model Apartment {
   shortDescription String
   maxAdults        Int
   maxChildren      Int
+  beds             Int                @default(2)
   bedrooms         Int
   bathrooms        Int
   pricePerNight    Float
+  minStay          Int                @default(1)
+  maxStay          Int                @default(30)
   isActive         Boolean            @default(true)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
