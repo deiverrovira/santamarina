@@ -12,6 +12,7 @@ import { createApartment, updateApartment } from '@/actions/apartments'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { X, ImagePlus, CheckCircle2 } from 'lucide-react'
+import { formatThousands } from '@/lib/utils'
 
 // ── Zod schema ───────────────────────────────────────────────────────────────
 const schema = z.object({
@@ -27,9 +28,12 @@ const schema = z.object({
   description: z.string().min(20, 'Mínimo 20 caracteres'),
   maxAdults: z.number().int().min(1, 'Mínimo 1').max(20),
   maxChildren: z.number().int().min(0).max(20),
+  beds: z.number().int().min(1, 'Mínimo 1'),
   bedrooms: z.number().int().min(1, 'Mínimo 1'),
   bathrooms: z.number().int().min(1, 'Mínimo 1'),
   pricePerNight: z.number().min(1000, 'Mínimo $1.000'),
+  minStay: z.number().int().min(1, 'Mínimo 1 noche'),
+  maxStay: z.number().int().min(1, 'Mínimo 1 noche'),
   isActive: z.boolean(),
   amenityIds: z.array(z.number()),
 })
@@ -71,6 +75,9 @@ export default function ApartmentForm({ amenities, apartment }: ApartmentFormPro
   const [images, setImages] = useState<UploadedImage[]>(
     apartment?.images.map((img) => ({ url: img.url, alt: img.alt, order: img.order })) ?? []
   )
+  const [priceDisplay, setPriceDisplay] = useState(
+    formatThousands(apartment?.pricePerNight ?? 150000)
+  )
   const [imageError, setImageError] = useState<string | null>(null)
   const [successSlug, setSuccessSlug] = useState<string | null>(null)
   const [serverError, setServerError] = useState<string | null>(null)
@@ -91,9 +98,12 @@ export default function ApartmentForm({ amenities, apartment }: ApartmentFormPro
       description: apartment?.description ?? '',
       maxAdults: apartment?.maxAdults ?? 2,
       maxChildren: apartment?.maxChildren ?? 0,
+      beds: apartment?.beds ?? 2,
       bedrooms: apartment?.bedrooms ?? 1,
       bathrooms: apartment?.bathrooms ?? 1,
       pricePerNight: apartment?.pricePerNight ?? 150000,
+      minStay: apartment?.minStay ?? 1,
+      maxStay: apartment?.maxStay ?? 30,
       isActive: apartment?.isActive ?? true,
       amenityIds: apartment?.amenities.map((a) => a.amenity.id) ?? [],
     },
@@ -211,7 +221,7 @@ export default function ApartmentForm({ amenities, apartment }: ApartmentFormPro
                 className={`w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 ${
                   errors.name
                     ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                    : 'border-gray-200 focus:border-teal-500 focus:ring-teal-500/20'
+                    : 'border-gray-200 focus:border-blue-500 focus:ring-blue-500/20'
                 }`}
               />
               {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
@@ -243,7 +253,7 @@ export default function ApartmentForm({ amenities, apartment }: ApartmentFormPro
                 className={`w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 resize-none ${
                   errors.shortDescription
                     ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                    : 'border-gray-200 focus:border-teal-500 focus:ring-teal-500/20'
+                    : 'border-gray-200 focus:border-blue-500 focus:ring-blue-500/20'
                 }`}
               />
               {errors.shortDescription && <p className="text-xs text-red-500">{errors.shortDescription.message}</p>}
@@ -261,7 +271,7 @@ export default function ApartmentForm({ amenities, apartment }: ApartmentFormPro
                 className={`w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 resize-none ${
                   errors.description
                     ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                    : 'border-gray-200 focus:border-teal-500 focus:ring-teal-500/20'
+                    : 'border-gray-200 focus:border-blue-500 focus:ring-blue-500/20'
                 }`}
               />
               {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
@@ -279,6 +289,8 @@ export default function ApartmentForm({ amenities, apartment }: ApartmentFormPro
                 {...register('maxAdults', { valueAsNumber: true })} error={errors.maxAdults?.message} />
               <Input label="Niños máx." type="number" min={0} max={20}
                 {...register('maxChildren', { valueAsNumber: true })} error={errors.maxChildren?.message} />
+              <Input label="Camas" type="number" min={1}
+                {...register('beds', { valueAsNumber: true })} error={errors.beds?.message} />
               <Input label="Habitaciones" type="number" min={1}
                 {...register('bedrooms', { valueAsNumber: true })} error={errors.bedrooms?.message} />
               <Input label="Baños" type="number" min={1}
@@ -292,17 +304,49 @@ export default function ApartmentForm({ amenities, apartment }: ApartmentFormPro
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium select-none">$</span>
                 <input
-                  type="number" min={1000} step={1000}
-                  {...register('pricePerNight', { valueAsNumber: true })}
-                  placeholder="150000"
+                  type="text"
+                  inputMode="numeric"
+                  value={priceDisplay}
+                  placeholder="150.000"
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/\./g, '')
+                    const num = parseInt(raw, 10)
+                    if (!isNaN(num)) {
+                      setValue('pricePerNight', num, { shouldValidate: true })
+                      setPriceDisplay(formatThousands(num))
+                    } else if (raw === '') {
+                      setValue('pricePerNight', 0, { shouldValidate: true })
+                      setPriceDisplay('')
+                    }
+                  }}
                   className={`w-full rounded-xl border pl-8 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 ${
                     errors.pricePerNight
                       ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                      : 'border-gray-200 focus:border-teal-500 focus:ring-teal-500/20'
+                      : 'border-gray-200 focus:border-blue-500 focus:ring-blue-500/20'
                   }`}
                 />
               </div>
               {errors.pricePerNight && <p className="text-xs text-red-500">{errors.pricePerNight.message}</p>}
+            </div>
+
+            {/* Min / Max stay */}
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Estadía mínima (noches)"
+                type="number"
+                min={1}
+                {...register('minStay', { valueAsNumber: true })}
+                error={errors.minStay?.message}
+                helperText="Mín. de noches por reserva"
+              />
+              <Input
+                label="Estadía máxima (noches)"
+                type="number"
+                min={1}
+                {...register('maxStay', { valueAsNumber: true })}
+                error={errors.maxStay?.message}
+                helperText="Máx. de noches por reserva"
+              />
             </div>
 
             {/* isActive toggle */}

@@ -8,6 +8,7 @@ import type { Amenity } from '@prisma/client'
 interface Filters {
   minPrice:   string
   maxPrice:   string
+  beds:       string
   bedrooms:   string
   sortBy:     string
   amenityIds: string[]  // array de IDs como strings
@@ -18,6 +19,14 @@ const PRICE_OPTIONS = [
   { label: 'Hasta $300.000/noche',  minPrice: '',       maxPrice: '300000' },
   { label: '$300.000 – $600.000',   minPrice: '300000', maxPrice: '600000' },
   { label: 'Más de $600.000/noche', minPrice: '600000', maxPrice: ''       },
+]
+
+const BED_OPTIONS = [
+  { label: 'Cualquier cantidad', value: '' },
+  { label: '1+ cama',            value: '1' },
+  { label: '2+ camas',           value: '2' },
+  { label: '3+ camas',           value: '3' },
+  { label: '4+ camas',           value: '4' },
 ]
 
 const BEDROOM_OPTIONS = [
@@ -75,6 +84,7 @@ export default function FilterDrawer({ amenities }: FilterDrawerProps) {
   const [filters, setFilters] = useState<Filters>({
     minPrice:   searchParams.get('minPrice')   ?? '',
     maxPrice:   searchParams.get('maxPrice')   ?? '',
+    beds:       searchParams.get('beds')       ?? '',
     bedrooms:   searchParams.get('bedrooms')   ?? '',
     sortBy:     searchParams.get('sortBy')     ?? '',
     amenityIds: searchParams.get('amenityIds') ? searchParams.get('amenityIds')!.split(',') : [],
@@ -84,6 +94,7 @@ export default function FilterDrawer({ amenities }: FilterDrawerProps) {
     setFilters({
       minPrice:   searchParams.get('minPrice')   ?? '',
       maxPrice:   searchParams.get('maxPrice')   ?? '',
+      beds:       searchParams.get('beds')       ?? '',
       bedrooms:   searchParams.get('bedrooms')   ?? '',
       sortBy:     searchParams.get('sortBy')     ?? '',
       amenityIds: searchParams.get('amenityIds') ? searchParams.get('amenityIds')!.split(',') : [],
@@ -97,6 +108,7 @@ export default function FilterDrawer({ amenities }: FilterDrawerProps) {
 
   const activeCount = [
     filters.minPrice || filters.maxPrice,
+    filters.beds,
     filters.bedrooms,
     filters.sortBy && filters.sortBy !== 'price_asc',
     filters.amenityIds.length > 0,
@@ -107,6 +119,7 @@ export default function FilterDrawer({ amenities }: FilterDrawerProps) {
     const set = (key: string, val: string) => val ? params.set(key, val) : params.delete(key)
     set('minPrice',   filters.minPrice)
     set('maxPrice',   filters.maxPrice)
+    set('beds',       filters.beds)
     set('bedrooms',   filters.bedrooms)
     set('sortBy',     filters.sortBy === 'price_asc' ? '' : filters.sortBy)
     set('amenityIds', filters.amenityIds.join(','))
@@ -115,10 +128,10 @@ export default function FilterDrawer({ amenities }: FilterDrawerProps) {
   }
 
   function clearFilters() {
-    const empty: Filters = { minPrice: '', maxPrice: '', bedrooms: '', sortBy: '', amenityIds: [] }
+    const empty: Filters = { minPrice: '', maxPrice: '', beds: '', bedrooms: '', sortBy: '', amenityIds: [] }
     setFilters(empty)
     const params = new URLSearchParams(searchParams.toString())
-    ;['minPrice', 'maxPrice', 'bedrooms', 'sortBy', 'amenityIds'].forEach(k => params.delete(k))
+    ;['minPrice', 'maxPrice', 'beds', 'bedrooms', 'sortBy', 'amenityIds'].forEach(k => params.delete(k))
     router.push(`/apartamentos?${params.toString()}`)
     setOpen(false)
   }
@@ -195,6 +208,20 @@ export default function FilterDrawer({ amenities }: FilterDrawerProps) {
                   label={opt.label}
                   active={selectedPriceIdx === i}
                   onClick={() => setFilters(f => ({ ...f, minPrice: opt.minPrice, maxPrice: opt.maxPrice }))}
+                />
+              ))}
+            </div>
+          </Section>
+
+          {/* Camas */}
+          <Section title="Camas">
+            <div className="space-y-1.5">
+              {BED_OPTIONS.map(opt => (
+                <RadioOption
+                  key={opt.label}
+                  label={opt.label}
+                  active={filters.beds === opt.value}
+                  onClick={() => setFilters(f => ({ ...f, beds: opt.value }))}
                 />
               ))}
             </div>

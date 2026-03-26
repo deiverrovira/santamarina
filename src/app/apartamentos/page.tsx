@@ -17,6 +17,7 @@ interface PageProps {
     minPrice?: string
     maxPrice?: string
     bedrooms?: string
+    beds?: string
     sortBy?: string
     amenityIds?: string
   }
@@ -31,6 +32,7 @@ async function ApartmentsList({ searchParams }: PageProps) {
     minPrice:   searchParams.minPrice,
     maxPrice:   searchParams.maxPrice,
     bedrooms:   searchParams.bedrooms,
+    beds:       searchParams.beds,
     sortBy:     searchParams.sortBy as SearchParams['sortBy'],
     amenityIds: searchParams.amenityIds,
   }
