@@ -4,7 +4,7 @@ import { requireRole } from '@/actions/auth'
 import ReservationActions from './ReservationActions'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Users, Calendar, Phone, Mail, BedDouble, ClipboardList, CheckCircle2, Clock, XCircle, Plus } from 'lucide-react'
+import { Users, Calendar, Phone, Mail, BedDouble, ClipboardList, CheckCircle2, Clock, XCircle } from 'lucide-react'
 
 type FilterTab = 'ALL' | 'PENDING' | 'CONFIRMED' | 'CANCELLED'
 

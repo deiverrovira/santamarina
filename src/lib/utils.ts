@@ -32,3 +32,7 @@ export function calculateNights(checkIn: string | Date, checkOut: string | Date)
 export function toDateInputValue(date: Date): string {
   return date.toISOString().split('T')[0]
 }
+
+export function formatThousands(amount: number): string {
+  return new Intl.NumberFormat('es-CO').format(amount)
+}

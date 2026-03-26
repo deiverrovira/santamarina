@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Users, Bed, Bath, ChevronRight } from 'lucide-react'
+import { Users, Bed, BedDouble, Bath, ChevronRight } from 'lucide-react'
 import { formatCurrency, calculateNights } from '@/lib/utils'
 import type { ApartmentWithImages } from '@/types'
 import Badge from '@/components/ui/Badge'
@@ -10,9 +10,14 @@ interface ApartmentCardProps {
   searchParams?: { checkIn?: string; checkOut?: string; adults?: string; children?: string }
 }
 
+const isValid = (val: unknown): val is string => typeof val === 'string' && val.trim() !== '' && val !== 'undefined'
+
 export default function ApartmentCard({ apartment, searchParams }: ApartmentCardProps) {
   const mainImage = apartment.images[0]
-  const params = searchParams ? `?${new URLSearchParams(searchParams as Record<string, string>).toString()}` : ''
+  const params = isValid(searchParams?.adults) &&
+    isValid(searchParams?.children) &&
+    isValid(searchParams?.checkIn) &&
+    isValid(searchParams?.checkOut) ? `?${new URLSearchParams(searchParams as Record<string, string>).toString()}` : ''
 
   const nights = searchParams?.checkIn && searchParams?.checkOut
     ? calculateNights(searchParams.checkIn, searchParams.checkOut)
@@ -44,9 +49,13 @@ export default function ApartmentCard({ apartment, searchParams }: ApartmentCard
         <h3 className="font-semibold text-gray-900 text-lg mb-1 truncate">{apartment.name}</h3>
         <p className="text-sm text-gray-500 mb-4 line-clamp-2">{apartment.shortDescription}</p>
 
-        <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
           <span className="flex items-center gap-1">
             <Bed className="w-4 h-4" />
+            {apartment.beds} camas
+          </span>
+          <span className="flex items-center gap-1">
+            <BedDouble className="w-4 h-4" />
             {apartment.bedrooms} hab.
           </span>
           <span className="flex items-center gap-1">

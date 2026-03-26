@@ -4,7 +4,7 @@ import ApartmentGallery from '@/components/apartments/ApartmentGallery'
 import AmenitiesList from '@/components/apartments/AmenitiesList'
 import BookingPanel from '@/components/booking/BookingPanel'
 import { formatDate } from '@/lib/utils'
-import { Bed, Bath, Users, ArrowLeft } from 'lucide-react'
+import { Bed, BedDouble, Bath, Users, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
@@ -69,6 +69,10 @@ export default async function ApartmentDetailPage({ params, searchParams }: Page
               <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-6">
                 <span className="flex items-center gap-1.5">
                   <Bed className="w-4 h-4" />
+                  {apartment.beds} cama{apartment.beds !== 1 ? 's' : ''}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <BedDouble className="w-4 h-4" />
                   {apartment.bedrooms} habitación{apartment.bedrooms !== 1 ? 'es' : ''}
                 </span>
                 <span className="flex items-center gap-1.5">
@@ -131,6 +135,8 @@ export default async function ApartmentDetailPage({ params, searchParams }: Page
               <BookingPanel
                 apartmentId={apartment.id}
                 pricePerNight={apartment.pricePerNight}
+                minStay={apartment.minStay}
+                maxStay={apartment.maxStay}
               />
             </div>
           </div>

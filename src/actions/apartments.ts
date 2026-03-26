@@ -25,6 +25,11 @@ export async function getApartments(params: SearchParams): Promise<ApartmentWith
     if (params.maxPrice) where.pricePerNight.lte = Number(params.maxPrice)
   }
 
+  // Filtro por camas mínimas
+  if (params.beds) {
+    where.beds = { gte: Number(params.beds) }
+  }
+
   // Filtro por habitaciones mínimas
   if (params.bedrooms) {
     where.bedrooms = { gte: Number(params.bedrooms) }
@@ -37,6 +42,17 @@ export async function getApartments(params: SearchParams): Promise<ApartmentWith
       where.amenities = {
         some: { amenityId: { in: ids } },
       }
+    }
+  }
+
+  // Filtro por estadía mínima/máxima cuando hay fechas seleccionadas
+  if (params.checkIn && params.checkOut) {
+    const nights = Math.round(
+      (new Date(params.checkOut).getTime() - new Date(params.checkIn).getTime()) / (1000 * 60 * 60 * 24)
+    )
+    if (nights > 0) {
+      where.minStay = { lte: nights }
+      where.maxStay = { gte: nights }
     }
   }
 
@@ -83,9 +99,12 @@ export async function createApartment(data: {
   shortDescription: string
   maxAdults: number
   maxChildren: number
+  beds: number
   bedrooms: number
   bathrooms: number
   pricePerNight: number
+  minStay: number
+  maxStay: number
   isActive: boolean
   amenityIds: number[]
   images: { url: string; alt: string; order: number }[]
@@ -167,9 +186,12 @@ export async function updateApartment(
     shortDescription: string
     maxAdults: number
     maxChildren: number
+    beds: number
     bedrooms: number
     bathrooms: number
     pricePerNight: number
+    minStay: number
+    maxStay: number
     isActive: boolean
     amenityIds: number[]
     images: { url: string; alt: string; order: number }[]
