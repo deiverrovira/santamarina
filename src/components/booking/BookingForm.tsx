@@ -8,6 +8,7 @@ import { BookingSchema, type BookingInput } from '@/lib/validations'
 import { createReservation } from '@/actions/reservations'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import DateRangePicker from '@/components/ui/DateRangePicker'
 import PriceSummary from './PriceSummary'
 
 interface BookingFormProps {
@@ -35,12 +36,11 @@ export default function BookingForm({
   const [serverError, setServerError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const today = new Date().toISOString().split('T')[0]
-
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<BookingInput>({
     resolver: zodResolver(BookingSchema),
@@ -54,6 +54,14 @@ export default function BookingForm({
   })
 
   const [watchCheckIn, watchCheckOut] = watch(['checkIn', 'checkOut'])
+
+  const handleRangeChange = (checkIn: string, checkOut: string) => {
+    setValue('checkIn', checkIn, { shouldValidate: true })
+    setValue('checkOut', checkOut, { shouldValidate: true })
+  }
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
 
   // Calcular noches y validar estadía
   const stayNights =
@@ -92,22 +100,14 @@ export default function BookingForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <input type="hidden" {...register('apartmentId', { valueAsNumber: true })} />
 
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          label="Fecha entrada"
-          type="date"
-          min={today}
-          {...register('checkIn')}
-          error={errors.checkIn?.message}
-        />
-        <Input
-          label="Fecha salida"
-          type="date"
-          min={today}
-          {...register('checkOut')}
-          error={errors.checkOut?.message}
-        />
-      </div>
+      <DateRangePicker
+        label="Fechas de estadía"
+        checkIn={watchCheckIn}
+        checkOut={watchCheckOut}
+        onRangeChange={handleRangeChange}
+        minDate={today}
+        error={errors.checkIn?.message || errors.checkOut?.message}
+      />
 
       {/* Resumen de precio reactivo — se actualiza al cambiar las fechas */}
       <PriceSummary
@@ -161,7 +161,7 @@ export default function BookingForm({
       />
 
       <Input
-        label="Teléfono"
+        label="Whatsapp"
         type="tel"
         placeholder="+57 300 123 4567"
         {...register('guestPhone')}

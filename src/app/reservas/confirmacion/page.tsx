@@ -45,6 +45,12 @@ export default async function ConfirmacionPage({ searchParams }: PageProps) {
           </p>
         </div>
 
+        {/* Info note */}
+        <div className="mb-6 mt-6 bg-blue-50 rounded-2xl p-5 text-sm text-blue-700 shadow-md">
+          <p className="font-medium mb-1">¿Qué sigue?</p>
+          <p>Nuestro equipo revisará tu solicitud y te contactará al correo <strong>{reservation.guestEmail}</strong> o mediante WhatsApp <strong>{reservation.guestPhone}</strong> dentro de las próximas 24 horas hábiles para confirmar tu reserva.</p>
+        </div>
+
         {/* Reservation card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Apartment image header */}
@@ -135,12 +141,6 @@ export default async function ConfirmacionPage({ searchParams }: PageProps) {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Info note */}
-        <div className="mt-6 bg-blue-50 rounded-2xl p-5 text-sm text-blue-700">
-          <p className="font-medium mb-1">¿Qué sigue?</p>
-          <p>Nuestro equipo revisará tu solicitud y te contactará al correo <strong>{reservation.guestEmail}</strong> dentro de las próximas 24 horas hábiles para confirmar tu reserva.</p>
         </div>
 
         {/* Actions */}

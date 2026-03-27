@@ -15,11 +15,12 @@ export function formatCurrency(amount: number): string {
 }
 
 export function formatDate(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date + 'T12:00:00') : date
   return new Intl.DateTimeFormat('es-CO', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-  }).format(new Date(date))
+  }).format(d)
 }
 
 export function calculateNights(checkIn: string | Date, checkOut: string | Date): number {
@@ -30,7 +31,10 @@ export function calculateNights(checkIn: string | Date, checkOut: string | Date)
 }
 
 export function toDateInputValue(date: Date): string {
-  return date.toISOString().split('T')[0]
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 export function formatThousands(amount: number): string {

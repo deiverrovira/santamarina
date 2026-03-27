@@ -1,5 +1,24 @@
 import { z } from 'zod'
 
+const ALLOWED_EMAIL_DOMAINS = [
+  // Google
+  'gmail.com', 'googlemail.com',
+  // Microsoft
+  'outlook.com', 'outlook.es', 'outlook.com.co',
+  'hotmail.com', 'hotmail.es', 'hotmail.co',
+  'live.com', 'live.es', 'live.com.co', 'msn.com',
+  // Yahoo
+  'yahoo.com', 'yahoo.es', 'yahoo.co',
+  // Apple
+  'icloud.com', 'me.com', 'mac.com',
+  // ProtonMail
+  'protonmail.com', 'proton.me',
+  // Otros reconocidos
+  'aol.com', 'zoho.com', 'mail.com', 'gmx.com', 'gmx.net',
+  // Colombia
+  'une.net.co', 'telmex.com.co',
+]
+
 export const SearchSchema = z.object({
   checkIn: z.string().min(1, 'La fecha de entrada es obligatoria'),
   checkOut: z.string().min(1, 'La fecha de salida es obligatoria'),
@@ -13,7 +32,15 @@ export const SearchSchema = z.object({
 export const BookingSchema = z.object({
   apartmentId: z.number().int().positive(),
   guestName: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').max(100),
-  guestEmail: z.string().email('Correo electrónico inválido'),
+  guestEmail: z.string()
+    .email('Correo electrónico inválido')
+    .refine(
+      (email) => {
+        const domain = email.split('@')[1]?.toLowerCase()
+        return domain ? ALLOWED_EMAIL_DOMAINS.includes(domain) : false
+      },
+      { message: 'Por favor usa un correo de un proveedor reconocido (Gmail, Outlook, Yahoo, etc.)' }
+    ),
   guestPhone: z.string().regex(/^\+?[\d\s\-()\\.]{7,20}$/, 'Teléfono inválido'),
   checkIn: z.string().min(1, 'La fecha de entrada es obligatoria'),
   checkOut: z.string().min(1, 'La fecha de salida es obligatoria'),
