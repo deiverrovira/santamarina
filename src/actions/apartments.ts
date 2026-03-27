@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import type { Amenity } from '@prisma/client'
 import type { SearchParams, ApartmentWithImages, ApartmentWithRelations, ApartmentForAdmin } from '@/types'
+import { generateDateRange } from '@/lib/ical-sync'
 
 export async function getApartments(params: SearchParams): Promise<ApartmentWithImages[]> {
   const adults   = Number(params.adults)   || 1
@@ -60,6 +61,8 @@ export async function getApartments(params: SearchParams): Promise<ApartmentWith
   if (params.checkIn && params.checkOut) {
     const checkIn  = new Date(params.checkIn)
     const checkOut = new Date(params.checkOut)
+
+    // 1. Excluir apartamentos con reservas que se solapen
     where.NOT = {
       reservations: {
         some: {
@@ -70,6 +73,19 @@ export async function getApartments(params: SearchParams): Promise<ApartmentWith
           ],
         },
       },
+    }
+
+    // 2. Excluir apartamentos con fechas bloqueadas por Airbnb
+    const dates = generateDateRange(params.checkIn, params.checkOut)
+    if (dates.length > 0) {
+      const blocked = await prisma.unavailableDate.findMany({
+        where:    { date: { in: dates } },
+        select:   { apartmentId: true },
+        distinct: ['apartmentId'],
+      })
+      if (blocked.length > 0) {
+        where.id = { notIn: blocked.map((b) => b.apartmentId) }
+      }
     }
   }
 
@@ -106,6 +122,7 @@ export async function createApartment(data: {
   minStay: number
   maxStay: number
   isActive: boolean
+  airbnbIcsUrl?: string
   amenityIds: number[]
   images: { url: string; alt: string; order: number }[]
 }): Promise<{ success: boolean; error?: string; slug?: string }> {
@@ -193,6 +210,7 @@ export async function updateApartment(
     minStay: number
     maxStay: number
     isActive: boolean
+    airbnbIcsUrl?: string
     amenityIds: number[]
     images: { url: string; alt: string; order: number }[]
   },
@@ -257,6 +275,22 @@ export async function toggleApartmentStatus(
     console.error('toggleApartmentStatus error:', err)
     const message = err instanceof Error ? err.message : 'Error desconocido'
     return { success: false, error: message }
+  }
+}
+
+// ── Admin: sincronizar calendario iCal de Airbnb manualmente ─────────────
+export async function syncIcalNow(
+  apartmentId: number,
+): Promise<{ success: boolean; count?: number; error?: string }> {
+  try {
+    const { syncApartmentCalendar } = await import('@/lib/ical-sync')
+    const count = await syncApartmentCalendar(apartmentId)
+    revalidatePath('/admin/apartamentos')
+    return { success: true, count }
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Error desconocido'
+    console.error('syncIcalNow error:', error)
+    return { success: false, error }
   }
 }
 

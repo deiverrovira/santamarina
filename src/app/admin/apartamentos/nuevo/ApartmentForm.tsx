@@ -11,12 +11,16 @@ import type { Amenity, Apartment, ApartmentImage } from '@prisma/client'
 import { createApartment, updateApartment } from '@/actions/apartments'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
-import { X, ImagePlus, CheckCircle2 } from 'lucide-react'
+import { X, ImagePlus, CheckCircle2, RefreshCw } from 'lucide-react'
 import { formatThousands } from '@/lib/utils'
+import { formatDistanceToNow } from 'date-fns'
+import { es } from 'date-fns/locale'
+import { syncIcalNow } from '@/actions/apartments'
 
 // ── Zod schema ───────────────────────────────────────────────────────────────
 const schema = z.object({
   name: z.string().min(3, 'Mínimo 3 caracteres'),
+  airbnbIcsUrl: z.string().optional(),
   slug: z
     .string()
     .min(3, 'Mínimo 3 caracteres')
@@ -72,6 +76,9 @@ interface ApartmentFormProps {
 export default function ApartmentForm({ amenities, apartment }: ApartmentFormProps) {
   const isEditing = !!apartment
 
+  const [syncLoading, setSyncLoading] = useState(false)
+  const [syncResult, setSyncResult] = useState<{ success: boolean; count?: number; error?: string } | null>(null)
+
   const [images, setImages] = useState<UploadedImage[]>(
     apartment?.images.map((img) => ({ url: img.url, alt: img.alt, order: img.order })) ?? []
   )
@@ -105,6 +112,7 @@ export default function ApartmentForm({ amenities, apartment }: ApartmentFormPro
       minStay: apartment?.minStay ?? 1,
       maxStay: apartment?.maxStay ?? 30,
       isActive: apartment?.isActive ?? true,
+      airbnbIcsUrl: apartment?.airbnbIcsUrl ?? '',
       amenityIds: apartment?.amenities.map((a) => a.amenity.id) ?? [],
     },
   })
@@ -119,6 +127,15 @@ export default function ApartmentForm({ amenities, apartment }: ApartmentFormPro
     if (!isEditing) {
       setValue('slug', toSlug(val), { shouldValidate: false })
     }
+  }
+
+  async function handleSyncNow() {
+    if (!apartment?.id) return
+    setSyncLoading(true)
+    setSyncResult(null)
+    const result = await syncIcalNow(apartment.id)
+    setSyncLoading(false)
+    setSyncResult(result)
   }
 
   function toggleAmenity(id: number) {
@@ -277,6 +294,61 @@ export default function ApartmentForm({ amenities, apartment }: ApartmentFormPro
               {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
             </div>
           </div>
+
+          {/* Airbnb iCal — solo en modo edición */}
+          {isEditing && apartment?.id && (
+            <div className="bg-white rounded-2xl border border-orange-100 shadow-sm p-6 space-y-4">
+              <h2 className="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
+                <RefreshCw className="w-4 h-4 text-orange-500" />
+                Integración Airbnb
+              </h2>
+              <p className="text-xs text-gray-400">
+                Pega el enlace de exportación de tu calendario de Airbnb para sincronizar fechas bloqueadas automáticamente.
+                Ve a <strong>Airbnb → Tu anuncio → Calendario → Conectar calendarios → Exportar calendario</strong>.
+              </p>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">URL del calendario (.ics)</label>
+                <input
+                  type="url"
+                  {...register('airbnbIcsUrl')}
+                  placeholder="https://www.airbnb.com/calendar/ical/..."
+                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20"
+                />
+              </div>
+
+              {/* Última sincronización */}
+              {apartment.lastSyncAt && (
+                <p className="text-xs text-gray-400">
+                  Última sincronización:{' '}
+                  {formatDistanceToNow(new Date(apartment.lastSyncAt), {
+                    addSuffix: true,
+                    locale: es,
+                  })}
+                </p>
+              )}
+
+              {/* Botón sincronizar */}
+              <button
+                type="button"
+                onClick={handleSyncNow}
+                disabled={syncLoading}
+                className="flex items-center gap-2 rounded-xl bg-orange-50 text-orange-600 border border-orange-200 px-4 py-2 text-sm font-medium hover:bg-orange-100 transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${syncLoading ? 'animate-spin' : ''}`} />
+                {syncLoading ? 'Sincronizando...' : 'Sincronizar ahora'}
+              </button>
+
+              {/* Resultado del sync */}
+              {syncResult && (
+                <p className={`text-xs font-medium ${syncResult.success ? 'text-emerald-600' : 'text-red-500'}`}>
+                  {syncResult.success
+                    ? `✓ ${syncResult.count} fechas sincronizadas correctamente`
+                    : `✗ ${syncResult.error}`}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Capacity & pricing */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">

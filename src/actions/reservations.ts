@@ -3,12 +3,14 @@
 import { prisma } from '@/lib/prisma'
 import { BookingSchema } from '@/lib/validations'
 import type { ReservationResult } from '@/types'
+import { generateDateRange } from '@/lib/ical-sync'
 
 export async function checkAvailability(
   apartmentId: number,
   checkIn: string,
   checkOut: string
 ): Promise<boolean> {
+  // 1. Verificar conflicto con reservas existentes
   const conflictingReservation = await prisma.reservation.findFirst({
     where: {
       apartmentId,
@@ -19,7 +21,18 @@ export async function checkAvailability(
       ],
     },
   })
-  return conflictingReservation === null
+  if (conflictingReservation) return false
+
+  // 2. Verificar fechas bloqueadas por Airbnb
+  const dates = generateDateRange(checkIn, checkOut)
+  if (dates.length > 0) {
+    const blocked = await prisma.unavailableDate.findFirst({
+      where: { apartmentId, date: { in: dates } },
+    })
+    if (blocked) return false
+  }
+
+  return true
 }
 
 export async function createReservation(formData: unknown): Promise<ReservationResult> {
@@ -54,6 +67,15 @@ export async function createReservation(formData: unknown): Promise<ReservationR
 
       if (conflict) {
         throw new Error('UNAVAILABLE')
+      }
+
+      // Re-check Airbnb blocked dates inside transaction
+      const dates = generateDateRange(checkIn, checkOut)
+      if (dates.length > 0) {
+        const blocked = await tx.unavailableDate.findFirst({
+          where: { apartmentId, date: { in: dates } },
+        })
+        if (blocked) throw new Error('UNAVAILABLE')
       }
 
       // Check apartment capacity
