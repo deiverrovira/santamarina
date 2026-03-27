@@ -33,7 +33,7 @@ export default async function HomePage() {
               </span>
             </h1>
             <p className="text-xl text-blue-50 max-w-2xl mx-auto">
-              Apartamentos de lujo a pasos del mar. Elige tus fechas y encuentra el espacio perfecto para tu familia o grupo.
+              Apartamentos de lujo a pocos pasos del mar. Elige tus fechas y encuentra el espacio perfecto para tu familia o grupo.
             </p>
           </div>
 
